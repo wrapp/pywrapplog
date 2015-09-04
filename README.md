@@ -1,5 +1,5 @@
-txwrapplog
-==========
+wrapplog
+========
 
 Changes to structlog to work according to WEP 007:
 
