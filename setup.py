@@ -7,7 +7,7 @@ setup(
     version='0.1.0',
     py_modules=['wrapplog'],
     install_requires=[
-        'structlog',
+        'structlog==15.0.0',
     ],
     zip_safe=False,
 )
