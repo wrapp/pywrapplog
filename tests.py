@@ -2,12 +2,10 @@ from cStringIO import StringIO
 from wrapplog import Logger, start_logging
 
 
-
 class TestWrappObserver(object):
     def setup(self):
         self.out = StringIO()
-        start_logging(self.out)
-        self.log = Logger()
+        self.log = Logger(self.out)
 
     def test_debug(self):
         self.log.debug('Hello!')
@@ -26,7 +24,7 @@ class TestWrappObserver(object):
         self.assert_output('ERROR {"level": "error", "msg": "Hello!", "namespace": "tests"}\n')
 
     def get_output(self):
-        self.out.reset()
+        self.out.seek(0)
         return self.out.read()
 
     def assert_output(self, expected):
