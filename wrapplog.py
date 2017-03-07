@@ -2,6 +2,7 @@ import os
 import json
 import inspect
 import collections
+from datetime import datetime
 
 import structlog
 from structlog.processors import JSONRenderer
@@ -20,6 +21,7 @@ class Logger(object):
         log = wrap_logger(
                         PrintLogger(output),
                         processors=[
+                            add_timestamp,
                             order_fields,
                             JSONRenderer(),
                             render_wrapp_log,
@@ -57,12 +59,22 @@ class Logger(object):
         return self._log.error(*args, **kwargs)
 
 
+def _timestamp():
+    return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
+
+
+def add_timestamp(_, __, event_dict):
+    event_dict['timestamp'] = _timestamp()
+    return event_dict
+
+
 def order_fields(_, level, event_dict):
     res = collections.OrderedDict()
     res['level'] = level
     res['msg'] = event_dict.pop('event')
     res.update(sorted(event_dict.items()))
     return res
+
 
 def render_wrapp_log(_, level, event_dict):
     return level.upper() + ' ' + event_dict
