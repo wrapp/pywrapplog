@@ -1,3 +1,5 @@
+import json
+import collections
 from mock import patch
 from datetime import datetime
 from cStringIO import StringIO
@@ -11,23 +13,37 @@ class TestWrappObserver(object):
         self.timestamp = datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
         timestamp_mock.return_value = self.timestamp
         self.out = StringIO()
-        self.log = Logger(self.out)
+        self.msg = 'Hello'
+        self.service = "api"
+        self.host = "host-01"
+        self.namespace = 'tests'
+        self.log = Logger(self.out, service=self.service, host=self.host)
+
+    def _generate_output(self, level):
+        res = collections.OrderedDict()
+        res['level'] = level
+        res['msg'] = self.msg
+        res['host'] = self.host
+        res['namespace'] = self.namespace
+        res['service'] = self.service
+        res['timestamp'] = self.timestamp
+        return '%s %s\n' % (level.upper(), json.dumps(res))
 
     def test_debug(self):
-        self.log.debug('Hello!')
-        self.assert_output('DEBUG {"level": "debug", "msg": "Hello!", "namespace": "tests", "timestamp": "%s"}\n' % self.timestamp)
+        self.log.debug(self.msg)
+        self.assert_output(self._generate_output('debug'))
 
     def test_info(self):
-        self.log.info('Hello!')
-        self.assert_output('INFO {"level": "info", "msg": "Hello!", "namespace": "tests", "timestamp": "%s"}\n' % self.timestamp)
+        self.log.info(self.msg)
+        self.assert_output(self._generate_output('info'))
 
     def test_warning(self):
-        self.log.warning('Hello!')
-        self.assert_output('WARNING {"level": "warning", "msg": "Hello!", "namespace": "tests", "timestamp": "%s"}\n' % self.timestamp)
+        self.log.warning(self.msg)
+        self.assert_output(self._generate_output('warning'))
 
     def test_error(self):
-        self.log.error('Hello!')
-        self.assert_output('ERROR {"level": "error", "msg": "Hello!", "namespace": "tests", "timestamp": "%s"}\n' % self.timestamp)
+        self.log.error(self.msg)
+        self.assert_output(self._generate_output('error'))
 
     def get_output(self):
         self.out.seek(0)
