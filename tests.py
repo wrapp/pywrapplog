@@ -17,12 +17,16 @@ class TestWrappObserver(object):
         self.service = "api"
         self.host = "host-01"
         self.namespace = 'tests'
+        self.event_data = {"user": {"name": "jude", "id": 1}}
         self.log = Logger(self.out, service=self.service, host=self.host)
 
     def _generate_output(self, level):
         res = collections.OrderedDict()
         res['level'] = level
         res['msg'] = self.msg
+        if level == 'event':
+            res['data'] = self.event_data
+
         res['host'] = self.host
         res['namespace'] = self.namespace
         res['service'] = self.service
@@ -44,6 +48,10 @@ class TestWrappObserver(object):
     def test_error(self):
         self.log.error(self.msg)
         self.assert_output(self._generate_output('error'))
+
+    def test_event(self):
+        self.log.event(self.msg, data=self.event_data)
+        self.assert_output(self._generate_output('event'))
 
     def get_output(self):
         self.out.seek(0)

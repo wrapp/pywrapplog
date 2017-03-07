@@ -6,14 +6,24 @@ from datetime import datetime
 
 import structlog
 from structlog.processors import JSONRenderer
-from structlog import PrintLogger, wrap_logger, PrintLoggerFactory
+from structlog import wrap_logger, BoundLogger, PrintLogger, PrintLoggerFactory
 
 
 # Deprecated
 def start_logging(output=None):
-    structlog.configure(
-            logger_factory=structlog.PrintLoggerFactory(output),
-            processors=[render_wrapp_log])
+    return
+
+
+class EventPrintLogger(PrintLogger):
+    def msg(self, message):
+        return super(EventPrintLogger, self).msg(message)
+
+    event = msg
+
+
+class EventLogger(BoundLogger):
+    def event(self, name, data=None):
+        return super(EventLogger, self)._proxy_to_logger('event', name, data=data)
 
 
 class Logger(object):
@@ -21,7 +31,8 @@ class Logger(object):
                  namespace=None, source=None,
                  service=None, host=None):
         log = wrap_logger(
-                        PrintLogger(output),
+                        EventPrintLogger(output),
+                        wrapper_class=EventLogger,
                         processors=[
                             add_timestamp,
                             order_fields,
@@ -67,6 +78,14 @@ class Logger(object):
 
     def error(self, *args, **kwargs):
         return self._log.error(*args, **kwargs)
+
+    def event(self, name, data):
+        """Logs an event.
+
+        :param name: Name of the event
+        :param data: Dictionary holding data to describe the event
+        """
+        return self._log.event(name, data=data)
 
 
 def _timestamp():
