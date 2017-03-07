@@ -14,16 +14,27 @@ def start_logging(output=None):
     return
 
 
-class EventPrintLogger(PrintLogger):
+class NumberValueError(Exception):
+    pass
+
+
+class WrappPrintLogger(PrintLogger):
     def msg(self, message):
-        return super(EventPrintLogger, self).msg(message)
+        return super(WrappPrintLogger, self).msg(message)
 
-    event = msg
+    event = metric = msg
 
 
-class EventLogger(BoundLogger):
+class WrappLogger(BoundLogger):
     def event(self, name, data=None):
-        return super(EventLogger, self)._proxy_to_logger('event', name, data=data)
+        return super(WrappLogger, self)._proxy_to_logger('event', name, data=data)
+
+    def metric(self, name, value=1):
+        try:
+            float(value)
+        except ValueError:
+            raise NumberValueError(value)
+        return super(WrappLogger, self)._proxy_to_logger('metric', name, value=value)
 
 
 class Logger(object):
@@ -31,8 +42,8 @@ class Logger(object):
                  namespace=None, source=None,
                  service=None, host=None):
         log = wrap_logger(
-                        EventPrintLogger(output),
-                        wrapper_class=EventLogger,
+                        WrappPrintLogger(output),
+                        wrapper_class=WrappLogger,
                         processors=[
                             add_timestamp,
                             order_fields,
@@ -86,6 +97,14 @@ class Logger(object):
         :param data: Dictionary holding data to describe the event
         """
         return self._log.event(name, data=data)
+
+    def metric(self, name, value):
+        """Logs a metric.
+
+        :param name: Name of the metric
+        :param value: A number holding the value of the metric
+        """
+        return self._log.metric(name, value=value)
 
 
 def _timestamp():

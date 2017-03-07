@@ -17,6 +17,7 @@ class TestWrappObserver(object):
         self.service = "api"
         self.host = "host-01"
         self.namespace = 'tests'
+        self.metric_value = 10
         self.event_data = {"user": {"name": "jude", "id": 1}}
         self.log = Logger(self.out, service=self.service, host=self.host)
 
@@ -31,6 +32,8 @@ class TestWrappObserver(object):
         res['namespace'] = self.namespace
         res['service'] = self.service
         res['timestamp'] = self.timestamp
+        if level == 'metric':
+            res['value'] = self.metric_value
         return '%s %s\n' % (level.upper(), json.dumps(res))
 
     def test_debug(self):
@@ -50,8 +53,12 @@ class TestWrappObserver(object):
         self.assert_output(self._generate_output('error'))
 
     def test_event(self):
-        self.log.event(self.msg, data=self.event_data)
+        self.log.event(self.msg, self.event_data)
         self.assert_output(self._generate_output('event'))
+
+    def test_metric(self):
+        self.log.metric(self.msg, self.metric_value)
+        self.assert_output(self._generate_output('metric'))
 
     def get_output(self):
         self.out.seek(0)
