@@ -90,15 +90,16 @@ class Logger(object):
     def error(self, *args, **kwargs):
         return self._log.error(*args, **kwargs)
 
-    def event(self, name, data):
+    def event(self, name, data=None):
         """Logs an event.
 
         :param name: Name of the event
         :param data: Dictionary holding data to describe the event
         """
+        data = data or {}
         return self._log.event(name, data=data)
 
-    def metric(self, name, value):
+    def metric(self, name, value=1):
         """Logs a metric.
 
         :param name: Name of the metric
