@@ -119,7 +119,11 @@ def add_timestamp(_, __, event_dict):
 def order_fields(_, level, event_dict):
     res = collections.OrderedDict()
     res['level'] = level
-    res['msg'] = event_dict.pop('event')
+    key = "msg"
+    if level in ["event", "metric"]:
+        key = level
+
+    res[key] = event_dict.pop('event')
     res.update(sorted(event_dict.items()))
     return res
 

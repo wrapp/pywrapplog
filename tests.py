@@ -24,10 +24,13 @@ class TestWrappObserver(object):
     def _generate_output(self, level):
         res = collections.OrderedDict()
         res['level'] = level
-        res['msg'] = self.msg
+        if level in ['event', 'metric']:
+            res[level] = self.msg
+        else:
+            res['msg'] = self.msg
+
         if level == 'event':
             res['data'] = self.event_data
-
         res['host'] = self.host
         res['namespace'] = self.namespace
         res['service'] = self.service
