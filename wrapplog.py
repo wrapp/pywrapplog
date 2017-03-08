@@ -120,10 +120,14 @@ def add_timestamp(_, __, event_dict):
 def order_fields(_, level, event_dict):
     res = collections.OrderedDict()
     res['level'] = level
-    key = "msg"
+    # Levels 'event' and 'metric', don't require 'namespace' and 'msg' fields.
+    # Instead, they would require the fields 'event' and 'metric'
+    # respectively for the name of the event and metric.
     if level in ["event", "metric"]:
+        event_dict.pop('namespace')
         key = level
-
+    else:
+        key = "msg"
     res[key] = event_dict.pop('event')
     res.update(sorted(event_dict.items()))
     return res

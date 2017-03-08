@@ -22,22 +22,54 @@ class TestWrappObserver(object):
         self.log = Logger(self.out, service=self.service, host=self.host)
 
     def _generate_output(self, level):
-        res = collections.OrderedDict()
-        res['level'] = level
-        if level in ['event', 'metric']:
-            res[level] = self.msg
-        else:
-            res['msg'] = self.msg
-
-        if level == 'event':
+        ''' Outputs the fields in an ordered way as per test expectations
+        Order is the following:
+        - level
+        - msg (For all log levels apart from 'metric' and 'event')
+        - event (Applicable for 'event' level)
+        - metric (Applicable for 'metric' level)
+        - all other fields are ordered in alphabetical order
+        - namespace is not applicable to 'event' and 'metric' level
+        '''
+        def generate_event_output():
+            res = collections.OrderedDict()
+            res['level'] = level
+            res['event'] = self.msg
             res['data'] = self.event_data
-        res['host'] = self.host
-        res['namespace'] = self.namespace
-        res['service'] = self.service
-        res['timestamp'] = self.timestamp
-        if level == 'metric':
+            res['host'] = self.host
+            res['service'] = self.service
+            res['timestamp'] = self.timestamp
+            return res
+
+        def generate_metric_output():
+            res = collections.OrderedDict()
+            res['level'] = level
+            res['metric'] = self.msg
+            res['host'] = self.host
+            res['service'] = self.service
+            res['timestamp'] = self.timestamp
             res['value'] = self.metric_value
-        return '%s %s\n' % (level.upper(), json.dumps(res))
+            return res
+
+        def generate_default_output():
+            ''' Applies to all other log levels apart from event and metric '''
+            res = collections.OrderedDict()
+            res['level'] = level
+            res['msg'] = self.msg
+            res['host'] = self.host
+            res['namespace'] = self.namespace
+            res['service'] = self.service
+            res['timestamp'] = self.timestamp
+            return res
+
+        output_dict = {}
+        if level == 'event':
+            output_dict = generate_event_output()
+        elif level == 'metric':
+            output_dict = generate_metric_output()
+        else:
+            output_dict = generate_default_output()
+        return '%s %s\n' % (level.upper(), json.dumps(output_dict))
 
     def test_debug(self):
         self.log.debug(self.msg)
