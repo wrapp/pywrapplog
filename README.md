@@ -14,7 +14,7 @@ In [1]: import wrapplog
 In [2]: log = wrapplog.Logger()
 
 In [3]: log.info('hello', name='Jane')
-INFO {"level": "info", "msg": "hello", "name": "Jane", "namespace": "__main__"}
+INFO {"level": "info", "msg": "hello", "name": "Jane", "service": None, "host":None, "namespace": "__main__"}
 
 In [4]: class MyClass(object):
    ...:     log = wrapplog.Logger()
@@ -23,7 +23,7 @@ In [4]: class MyClass(object):
    ...:
 
 In [5]: MyClass().hello('Jane')
-WARNING {"level": "warning", "msg": "HELLO", "name": "Jane", "namespace": "__main__.MyClass"}
+WARNING {"level": "warning", "msg": "HELLO", "name": "Jane", "service": None, "host":None, "namespace": "__main__.MyClass"}
 
 ```
 

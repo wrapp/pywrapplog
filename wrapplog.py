@@ -60,12 +60,10 @@ class Logger(object):
         self._log = log.bind(namespace=namespace)
 
         service = service or os.environ.get('SERVICE_NAME')
-        if service:
-            self._log = self._log.bind(service=service)
+        self._log = self._log.bind(service=service)
 
         host = host or os.environ.get('HOSTNAME')
-        if host:
-            self._log = self._log.bind(host=host)
+        self._log = self._log.bind(host=host)
 
     def __get__(self, oself, type=None):
         if oself is None:
