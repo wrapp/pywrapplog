@@ -124,5 +124,5 @@ def order_fields(_, level, event_dict):
     return res
 
 
-def render_wrapp_log(_, level, event_dict):
-    return level.upper() + ' ' + event_dict
+def render_wrapp_log(_, level, event_str):
+    return level.upper() + ' ' + event_str
