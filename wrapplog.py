@@ -41,17 +41,6 @@ class Logger(object):
         host = host or os.environ.get('HOSTNAME')
         self._log = self._log.bind(host=host)
 
-    def __get__(self, oself, type=None):
-        if oself is None:
-            source = type
-        else:
-            source = oself
-
-        return self.__class__(
-            ".".join([type.__module__, type.__name__]),
-            source,
-        )
-
     def debug(self, *args, **kwargs):
         return self._log.debug(*args, **kwargs)
 
