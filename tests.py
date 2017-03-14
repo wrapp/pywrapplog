@@ -15,15 +15,13 @@ class TestWrappObserver(object):
         self.out = StringIO()
         self.msg = 'Hello'
         self.service = "api"
-        self.host = "host-01"
         self.namespace = 'tests'
-        self.log = Logger(self.out, service=self.service, host=self.host)
+        self.log = Logger(self.out, service=self.service)
 
     def _generate_output(self, level):
         res = collections.OrderedDict()
         res['level'] = level
         res['msg'] = self.msg
-        res['host'] = self.host
         res['namespace'] = self.namespace
         res['service'] = self.service
         res['timestamp'] = self.timestamp

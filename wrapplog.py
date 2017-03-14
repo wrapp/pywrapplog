@@ -16,8 +16,7 @@ def start_logging(output=None):
 
 class Logger(object):
     def __init__(self, output=None,
-                 namespace=None, source=None,
-                 service=None, host=None):
+                 namespace=None, source=None, service=None):
         log = wrap_logger(
                         PrintLogger(output),
                         processors=[
@@ -37,9 +36,6 @@ class Logger(object):
 
         service = service or os.environ.get('SERVICE_NAME')
         self._log = self._log.bind(service=service)
-
-        host = host or os.environ.get('HOSTNAME')
-        self._log = self._log.bind(host=host)
 
     def debug(self, *args, **kwargs):
         return self._log.debug(*args, **kwargs)
