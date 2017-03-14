@@ -32,10 +32,8 @@ class Logger(object):
                 namespace = frame.f_globals['__name__']
             except:
                 namespace = 'unknown'
-        self._log = log.bind(namespace=namespace)
 
-        service = service or os.environ.get('SERVICE_NAME')
-        self._log = self._log.bind(service=service)
+        self._log = log.bind(namespace=namespace, service=service)
 
     def debug(self, *args, **kwargs):
         return self._log.debug(*args, **kwargs)
