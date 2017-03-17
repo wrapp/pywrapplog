@@ -33,6 +33,7 @@ class Logger(object):
             except:
                 namespace = 'unknown'
 
+        service = service or os.environ.get('SERVICE_NAME')
         self._log = log.bind(namespace=namespace, service=service)
 
     def debug(self, *args, **kwargs):
