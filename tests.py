@@ -25,7 +25,7 @@ class TestWrappObserver(object):
         res['namespace'] = self.namespace
         res['service'] = self.service
         res['timestamp'] = self.timestamp
-        return '%s %s\n' % (level.upper(), json.dumps(res))
+        return json.dumps(res) + '\n'
 
     def test_debug(self):
         self.log.debug(self.msg)
@@ -42,6 +42,16 @@ class TestWrappObserver(object):
     def test_error(self):
         self.log.error(self.msg)
         self.assert_output(self._generate_output('error'))
+
+    def test_traceback(self):
+        try:
+            raise ValueError
+        except ValueError:
+            self.log.error_with_traceback(self.msg)
+
+        actual = json.loads(self.get_output())
+        assert actual['level'] == 'error'
+        assert actual['trace'] is not None
 
     def get_output(self):
         self.out.seek(0)

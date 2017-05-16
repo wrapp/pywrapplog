@@ -1,22 +1,21 @@
 import os
-import json
 import inspect
 import collections
 from datetime import datetime
 
-import structlog
 from structlog.processors import JSONRenderer
 from structlog import wrap_logger, PrintLogger, PrintLoggerFactory
+
+import traceback
 
 
 # Deprecated
 def start_logging(output=None):
-    return
-
+    pass
 
 class Logger(object):
     def __init__(self, output=None,
-                 namespace=None, source=None, service=None):
+                 source=None, namespace=None, service=None):
         log = wrap_logger(
                         PrintLogger(output),
                         processors=[
@@ -48,6 +47,10 @@ class Logger(object):
     def error(self, *args, **kwargs):
         return self._log.error(*args, **kwargs)
 
+    def error_with_traceback(self, *args, **kwargs):
+        tb = traceback.format_exc()
+        return self._log.error(*args, trace=tb, **kwargs)
+
 
 def _timestamp():
     return datetime.utcnow().strftime("%Y-%m-%dT%H:%M:%SZ")
@@ -67,4 +70,4 @@ def order_fields(_, level, event_dict):
 
 
 def render_wrapp_log(_, level, event_str):
-    return level.upper() + ' ' + event_str
+    return event_str
