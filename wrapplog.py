@@ -1,6 +1,7 @@
 import os
 import inspect
 import collections
+import sys
 from datetime import datetime
 
 from structlog.processors import JSONRenderer
@@ -9,13 +10,25 @@ from structlog import wrap_logger, PrintLogger, PrintLoggerFactory
 import traceback
 
 
-# Deprecated
 def start_logging(output=None):
-    pass
+    sys.stdout = CustomStdout()
+
+
+class CustomStdout(object):
+    def __init__(self):
+        service = os.environ.get('SERVICE_NAME', 'unknown')
+        self.log = Logger(sys.__stdout__, service=service)
+
+    def write(self, message):
+        # When message isn't a JSON, log it as a warning
+        if message[0] != '{':
+            self.log.warning(message)
+        else:
+            sys.__stdout__.write(message)
+
 
 class Logger(object):
-    def __init__(self, output=None,
-                 source=None, namespace=None, service=None):
+    def __init__(self, output=None, source=None, namespace=None, service=None):
         log = wrap_logger(
                         PrintLogger(output),
                         processors=[
