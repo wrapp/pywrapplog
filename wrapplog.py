@@ -19,9 +19,12 @@ class CustomStdout(object):
         service = os.environ.get('SERVICE_NAME', 'unknown')
         self.log = Logger(sys.__stdout__, service=service)
 
+    def flush(self):
+        sys.__stdout__.flush()
+
     def write(self, message):
         # When message isn't a JSON, log it as a warning
-        if message[0] != '{':
+        if message[0] != '{' and message[0] != '\n':
             self.log.warning(message)
         else:
             sys.__stdout__.write(message)
