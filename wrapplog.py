@@ -11,23 +11,25 @@ import traceback
 
 
 def start_logging(output=None):
-    sys.stdout = CustomStdout()
+    sys.stderr = NonJSONMessageWrapper(sys.__stderr__)
+    sys.stdout = NonJSONMessageWrapper(sys.__stdout__)
 
 
-class CustomStdout(object):
-    def __init__(self):
-        service = os.environ.get('SERVICE_NAME', 'unknown')
-        self.log = Logger(sys.__stdout__, service=service)
+class NonJSONMessageWrapper(object):
+    def __init__(self, output):
+        self.output = output
+        self.log = Logger(sys.__stdout__,
+                          service=os.environ.get('SERVICE_NAME', 'unknown'))
 
     def flush(self):
-        sys.__stdout__.flush()
+        self.output.flush()
 
     def write(self, message):
         # When message isn't a JSON, log it as a warning
         if message[0] != '{' and message[0] != '\n':
             self.log.warning(message)
         else:
-            sys.__stdout__.write(message)
+            self.output.write(message)
 
 
 class Logger(object):
