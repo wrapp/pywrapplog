@@ -5,31 +5,13 @@ import sys
 from datetime import datetime
 
 from structlog.processors import JSONRenderer
-from structlog import wrap_logger, PrintLogger, PrintLoggerFactory
+from structlog import wrap_logger, PrintLogger
 
 import traceback
 
 
 def start_logging(output=None):
-    sys.stderr = NonJSONMessageWrapper(sys.__stderr__)
-    sys.stdout = NonJSONMessageWrapper(sys.__stdout__)
-
-
-class NonJSONMessageWrapper(object):
-    def __init__(self, output):
-        self.output = output
-        self.log = Logger(sys.__stdout__,
-                          service=os.environ.get('SERVICE_NAME', 'unknown'))
-
-    def flush(self):
-        self.output.flush()
-
-    def write(self, message):
-        # When message isn't a JSON, log it as a warning
-        if message[0] != '{' and message[0] != '\n':
-            self.log.warning(message)
-        else:
-            self.output.write(message)
+    pass
 
 
 class Logger(object):
