@@ -2,7 +2,7 @@ import json
 import collections
 from mock import patch
 from datetime import datetime
-from cStringIO import StringIO
+from io import StringIO
 
 from wrapplog import Logger
 
